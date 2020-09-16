@@ -1,0 +1,5 @@
+[INTENT SLOT]
+number	CLOVA.NUMBER
+
+[INTENT EXPRESSION]
+<number>1</number>
