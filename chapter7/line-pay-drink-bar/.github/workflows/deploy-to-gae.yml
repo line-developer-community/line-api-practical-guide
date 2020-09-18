@@ -1,0 +1,41 @@
+name: Deploy to Google App Engine
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Setup gcloud environment
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '285.0.0'
+          project_id: ${{ secrets.FIREBASE_PROJECT_ID }}
+          # The service account email which will be used for authentication.
+          service_account_email: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          # The service account key which will be used for authentication.
+          service_account_key: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS }}
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Create .env.prod file
+        run: echo "${{ secrets.ENV_PROD }}" > config/.env.prod
+
+      - name: Build module
+        run: yarn build
+
+      - name: Deploy to Google App Engine
+        run: gcloud app deploy app.yaml --project ${{ secrets.FIREBASE_PROJECT_ID }}
