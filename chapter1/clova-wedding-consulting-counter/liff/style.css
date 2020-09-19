@@ -1,0 +1,17 @@
+.image-wrapper {
+    width: 100%;
+}
+.image-wrapper img {
+    width: 100%;
+}
+.wrapper {
+    margin: 12px 6px 0 6px;
+}
+
+.title {
+    color: #171e7f;
+    padding: 0 0 6px 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: center;
+}

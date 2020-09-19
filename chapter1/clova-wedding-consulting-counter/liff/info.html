@@ -1,0 +1,113 @@
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/style.css" >
+    <title>申込情報を入力</title>
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+    <script>
+        window.onload = function (e) {
+            let myLiffId = "";
+            // APIからLIFF IDのJSONを取得する
+            fetch('./info')
+                .then((response) => response.json())
+                .then(function(jsonResponse) {
+                    myLiffId = jsonResponse.id;
+                    initializeLiff(myLiffId);
+                })
+                
+            // sendにclickイベントを追加
+            document.getElementById('send').addEventListener('click', function() {
+                // LIFFアプリをLINE内ブラウザで動作させているかどうかを取得します。
+                if (!liff.isInClient()) {
+                    window.alert('LIFFは現在外部ブラウザで開いているため、このボタンは使用できません。');
+                } else {
+                    var name = $("input[name='name']").val();
+                    var number = $("select[name='number']").val();
+                    var date = $("input[name='date']").val();
+                    let text = "お申し込み\n" +
+                      "--------\n" +
+                      "お名前: " + name + "\n" +
+                      "人数: " + number + "\n" +
+                      "日付: " + replaceAll(date, "-", "/");
+                      
+                    // トーク画面にメッセージを送信します。
+                    liff.sendMessages([{
+                        'type': 'text',
+                        'text': text
+                    }]).then(function() {
+                        liff.closeWindow()
+                    }).catch(function(error) {
+                        window.alert('エラー送信: ' + error);
+                    });
+                }
+            });
+        };
+      
+        function initializeLiff(myLiffId) { 
+            // LIFFアプリを初期化
+            liff.init(
+                {
+                    liffId: myLiffId
+                })
+                .then(() => {
+                    // ユーザーがログインしているかどうかを取得します。
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                    }
+                    // ユーザーのプロフィールを取得します。
+                    liff.getProfile().then(function(profile) {
+                        $("input[name='name']").val(profile.displayName);
+                    })
+                    .catch(function(error) {
+                        window.alert('プロファイル取得のエラー: ' + error);
+                    });
+                })
+                .catch((error) => {
+                    window.alert('初期化のエラー: ' + error);
+                });
+        }
+        
+        function replaceAll(str, beforeStr, afterStr){
+            var reg = new RegExp(beforeStr, "g");
+            return str.replace(reg, afterStr);
+        }
+    </script>
+</head>
+<body>
+<!-- 申し込みに必要な情報を入力 -->
+<div class="container">
+    <form>
+        <div class="form-group">
+            <label for="name">お名前</label>
+            <input id="name" type="text" name="name" class="form-control" placeholder="名前を入力して下さい">
+        </div>
+        <div class="form-group">
+            <label for="number">人数</label>
+            <select id="number" class="form-control" name="number">
+                <option>10</option>
+                <option>20</option>
+                <option>30</option>
+                <option>40</option>
+                <option>50</option>
+                <option>60</option>
+                <option>70</option>
+                <option>80</option>
+                <option>90</option>
+                <option>100</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="date">日付</label>
+            <input id="date" type="date" name="date" class="form-control" placeholder="日付を入力して下さい" min="1" max="10">
+        </div>
+        <button id="send" class="btn btn-primary btn-lg btn-block" type="button">申込</button>
+    </form>
+</div>
+</body>

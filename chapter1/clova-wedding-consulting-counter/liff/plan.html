@@ -1,0 +1,56 @@
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style.css" >
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <title>プランの詳細</title>
+    <script>
+      window.onload = function onLoad() {
+        // URLパラメータ取得
+        const queryString = decodeURIComponent(window.location.search).replace("?liff.state=", "");
+        const params = new URLSearchParams(queryString);
+        const planId = params.get('planId');
+        
+        $.get("/api/plan?id=" + planId, function (data) {
+          const plan = data.plan;
+          $("#placeImg").attr("src", plan.placeImageUrl);
+          $("#name").text(plan.name);
+          $("#place").text(plan.place);
+          $("#price").text(plan.price);
+          $("#costumeImg").attr("src", plan.costumeImageUrl);
+          $("#costumeName").text(plan.costume);
+          $("#eventImg").attr("src", plan.eventImageUrl);
+          $("#eventName").text(plan.event);
+        });
+      }
+    </script>
+</head>
+<body>
+<!-- ブライダルプランについて -->
+<div class="wrapper">
+    <div class="title" id="name"></div>
+    <div id="place"></div>
+    <div id="price"></div>
+</div>
+<div class="image-wrapper">
+    <img src="" id="placeImg"/>
+</div>
+<div class="wrapper">
+    <div class="title" id="costumeName"></div>
+</div>
+<div class="image-wrapper">
+    <img src="" id="costumeImg"/>
+</div>
+<div class="wrapper">
+    <div class="title" id="eventName"></div>
+</div>
+<div class="image-wrapper">
+    <img src="" id="eventImg"/>
+</div>
+</body>
+</html>
