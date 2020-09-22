@@ -1,0 +1,13 @@
+@inherits LayoutComponentBase
+@inject ILiffClient Liff
+@inject IJSRuntime JSRuntime
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="content px-2">
+        @Body
+    </div>
+</div>

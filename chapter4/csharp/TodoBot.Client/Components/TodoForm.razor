@@ -1,0 +1,61 @@
+﻿@inject ILiffClient Liff
+@inject IJSRuntime JSRuntime
+@inject HttpClient httpClient
+@inject NavigationManager Navigation
+
+<EditForm style="max-width:24rem;" Model="Todo" OnValidSubmit="OnButtonClickAsync">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="title">タイトル</label>
+        <input type="text" name="title" class="form-control" @bind="Todo.Title" />
+    </div>
+    <div class="form-group">
+        <label for="content">詳細</label>
+        <textarea class="form-control" name="content" @bind="Todo.Content" />
+    </div>
+    <div class="form-group">
+        <label for="status">状況</label>
+        <select class="form-control" name="status" @bind="Todo.Status">
+            <option value="@Status.Ready">@Status.Ready.ToString()</option>
+            <option value="@Status.Doing">@Status.Doing.ToString()</option>
+            <option value="@Status.Done">@Status.Done.ToString()</option>
+            <option value="@Status.Canceled">@Status.Canceled.ToString()</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="dueDate">期日</label>
+        <input type="date" class="form-control" name="dueDate" @bind="Todo.DueDate" @bind:format="yyyy-MM-dd" />
+    </div>
+    <div class="text-danger">
+        <ValidationSummary></ValidationSummary>
+    </div>
+    <button class="form-control btn btn-primary">@ButtonName</button>
+</EditForm>
+<Alert Message="@ErrorMessage" AlertType="danger"></Alert>
+
+@code{
+    [Parameter]
+    public Todo Todo { get; set; }
+
+    [Parameter]
+    public string ButtonName { get; set; }
+
+    [Parameter]
+    public Func<Todo, Task> ButtonClickAsync { get; set; }
+
+    string ErrorMessage;
+
+    async Task OnButtonClickAsync()
+    {
+        ErrorMessage = null;
+        try
+        {
+            await ButtonClickAsync?.Invoke(Todo);
+            Navigation.NavigateTo($"{Navigation.BaseUri}");
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.Message;
+        }
+    }
+}

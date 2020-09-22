@@ -1,0 +1,258 @@
+﻿@page "/"
+@inject IJSRuntime JSRuntime
+@inject ILiffClient Liff
+@inject ITodoClient TodoClient
+@inject NavigationManager Navigation
+
+<header class="navbar navbar-light sticky-top mb-2" style="background-color: #e3f2fd;">
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <button class="btn btn-info @(Filter == FilterType.NotCompleted? "active" : string.Empty)"
+                    @onclick="()=>FilterTodoList(FilterType.NotCompleted)">
+                <span class="text-sm-center">未完</span>
+            </button>
+            <button class="btn btn-info @(Filter == FilterType.Ready? "active" : string.Empty)"
+                    @onclick="()=>FilterTodoList(FilterType.Ready)">
+                <span class="text-sm-center">New!</span>
+            </button>
+            <button class="btn btn-info @(Filter == FilterType.Doing? "active" : string.Empty)"
+                    @onclick="()=>FilterTodoList(FilterType.Doing)">
+                <span class="text-sm-center">実施中</span>
+            </button>
+            <button class="btn btn-info @(Filter == FilterType.Completed? "active" : string.Empty)"
+                    @onclick="()=>FilterTodoList(FilterType.Completed)">
+                <span class="text-sm-center">完了</span>
+            </button>
+        </div>
+        <button type="button" class="btn btn-outline-dark" @onclick="Create">
+            <span class="oi oi-plus"></span>
+        </button>
+    </div>
+</header>
+
+@if (SourceTodoList == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    @foreach (var todo in TodoList)
+    {
+        <div class="card shadow mb-3" style="max-width: 24rem;">
+            <div class="card-header">
+                @switch (todo.Status)
+                {
+                    case Status.Ready:
+                        <span class="badge-info badge-pill p-2 mr-2">@todo.Status</span>
+                        break;
+                    case Status.Doing:
+                        <span class="badge-primary badge-pill p-2 mr-2">@todo.Status</span>
+                        break;
+                    case Status.Done:
+                        <span class="badge-success badge-pill p-2 mr-2">@todo.Status</span>
+                        break;
+                    case Status.Canceled:
+                        <span class="badge-secondary badge-pill p-2 mr-2">@todo.Status</span>
+                        break;
+                }
+                <span class="card-text">期限:&nbsp;@todo.DueDate.ToString("yyyy/MM/dd")</span>
+                <button class="btn btn-secondary btn-sm float-right" @onclick="()=>Edit(todo.Id)"><span class="oi oi-pencil"></span></button>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">@todo.Title</h5>
+                <p class="card-text">@todo.Content</p>
+            </div>
+            <div class="card-footer text-center">
+
+                @if (todo.Status == Status.Ready)
+                {
+                    <button class="btn btn-primary" @onclick="@(async ()=> await UpdateStatusAsync(todo,Status.Doing))">やる！</button>
+                }
+                @if (todo.Status == Status.Doing)
+                {
+                    <button class="btn btn-success" @onclick="@(async ()=> await UpdateStatusAsync(todo,Status.Done))">完了にする</button>
+                }
+                @if (todo.Status == Status.Done || todo.Status == Status.Canceled)
+                {
+                    <button class="btn btn-danger" @onclick="@(async ()=> await DeleteAsync(todo.Id))">削除</button>
+                }
+            </div>
+        </div>
+    }
+}
+<Alert Message="@ErrorMessage" AlertType="danger"></Alert>
+
+
+@code{
+    /// <summary>
+    /// フィルター種別種別
+    /// </summary>
+    enum FilterType
+    {
+        /// <summary>
+        /// 未完（Ready + Doing）
+        /// </summary>
+        NotCompleted,
+        /// <summary>
+        /// New！
+        /// </summary>
+        Ready,
+        /// <summary>
+        /// 実施中
+        /// </summary>
+        Doing,
+        /// <summary>
+        /// キャンセル
+        /// </summary>
+        Completed
+    }
+    FilterType Filter { get; set; } = FilterType.NotCompleted;
+    IList<Todo> TodoList { get; set; }
+    IList<Todo> SourceTodoList { get; set; }
+
+    string UserId { get; set; }
+    string AccessToken { get; set; }
+    string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErrorMessage = null;
+        try
+        {
+            if (!await Liff.InitializeAsync(JSRuntime))
+            {
+                return;
+            }
+            await ListTodoAsync();
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Todo一覧の取得
+    /// </summary>
+    private async Task ListTodoAsync()
+    {
+        ErrorMessage = null;
+        SourceTodoList = null;
+        try
+        {
+            if (string.IsNullOrEmpty(await Liff.GetAccessToken()))
+            {
+                ErrorMessage = "Could not get the accessToken.";
+                return;
+            }
+            //IDトークンに含まれるユーザーIDを取得
+            var idToken = await Liff.GetDecodedIDToken();
+            UserId = idToken?.Sub;
+            if (string.IsNullOrEmpty(UserId))
+            {
+                ErrorMessage = "Failed to get a user ID.";
+                return;
+            }
+            //アクセストークンの取得
+            AccessToken = await Liff.GetAccessToken();
+            if (string.IsNullOrEmpty(AccessToken))
+            {
+                ErrorMessage = "Failed to get an access token.";
+            }
+            //指定したユーザーのTodo一覧を取得
+            SourceTodoList = await TodoClient.GetTodoListAsync(AccessToken, UserId);
+            //選択されているフィルター種別で一覧を絞り込み
+            FilterTodoList(Filter);
+
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Todo一覧のフィルター
+    /// </summary>
+    /// <param name="filterType">フィルター種別</param>
+    private void FilterTodoList(FilterType filterType)
+    {
+        Filter = filterType;
+
+        if (SourceTodoList == null) { return; }
+        //DBから全件取得し、SourceTodoList格納
+        //選択されているフィルタータイプに応じて絞り込み、表示用のTodoListに設定する
+        switch (Filter)
+        {
+            case FilterType.NotCompleted:
+                TodoList = SourceTodoList.Where(todo => todo.Status != Status.Done && todo.Status != Status.Canceled).ToList();
+                break;
+            case FilterType.Ready:
+                TodoList = SourceTodoList.Where(todo => todo.Status == Status.Ready).ToList();
+                break;
+            case FilterType.Doing:
+                TodoList = SourceTodoList.Where(todo => todo.Status == Status.Doing).ToList();
+                break;
+            case FilterType.Completed:
+                TodoList = SourceTodoList.Where(todo => todo.Status == Status.Done || todo.Status == Status.Canceled).ToList();
+                break;
+        }
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// ステータス更新
+    /// </summary>
+    /// <param name="todo">対象Todo</param>
+    /// <param name="status">変更後のステータス</param>
+    private async Task UpdateStatusAsync(Todo todo, Status status)
+    {
+        ErrorMessage = null;
+        try
+        {
+            todo.Status = status;
+            await TodoClient.UpdateTodoAsync(AccessToken, todo.Id, todo);
+            await ListTodoAsync();
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Todoの削除
+    /// </summary>
+    /// <param name="id">対象TodoのID</param>
+    private async Task DeleteAsync(string id)
+    {
+        ErrorMessage = null;
+        try
+        {
+            await TodoClient.DeleteTodoAsync(AccessToken, UserId, id);
+            await ListTodoAsync();
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.ToString();
+        }
+    }
+
+    /// <summary>
+    /// 編集画面への遷移
+    /// </summary>
+    /// <param name="id">編集対象TodoのID</param>
+    private void Edit(string id)
+    {
+
+        Navigation.NavigateTo($"{Navigation.BaseUri}edit/{id}");
+    }
+
+    /// <summary>
+    /// 新規作成画面への遷移
+    /// </summary>
+    private void Create()
+    {
+        Navigation.NavigateTo($"{Navigation.BaseUri}create");
+    }
+}
