@@ -1,0 +1,52 @@
+﻿@page "/edit/{Id}"
+@inject IJSRuntime JSRuntime
+@inject ILiffClient Liff
+@inject ITodoClient TodoClient
+
+@if (Todo == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <TodoForm Todo="Todo"
+              ButtonName="更新"
+              ButtonClickAsync="UpdateTodoAsync"></TodoForm>
+}
+<Alert Message="@ErrorMessage" AlertType="danger"></Alert>
+
+@code{
+    [Parameter]
+    public string Id { get; set; }
+
+    Todo Todo { get; set; }
+
+    string UserId { get; set; }
+    string AccessToken { get; set; }
+    string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!await Liff.InitializeAsync(JSRuntime))
+            {
+                return;
+            }
+            UserId = (await Liff.GetDecodedIDToken())?.Sub;
+            AccessToken = await Liff.GetAccessToken();
+
+            Todo = await TodoClient.GetTodoAsync(AccessToken, UserId, Id);
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.ToString();
+        }
+    }
+
+    async Task UpdateTodoAsync(Todo todo)
+    {
+        todo.UserId = UserId;
+        await TodoClient.UpdateTodoAsync(AccessToken, Id, todo);
+    }
+}

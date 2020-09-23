@@ -1,0 +1,23 @@
+﻿@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="alert-@AlertType">
+        @Message
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" @onclick="CloseButtonClick">
+            <span aria-hidden="true" class="oi oi-x"></span>
+        </button>
+    </div>
+}
+
+@code{
+    [Parameter]
+    public string Message { get; set; }
+
+    [Parameter]
+    public string AlertType { get; set; } = "danger";
+    private void CloseButtonClick()
+    {
+        Message = null;
+        StateHasChanged();
+    }
+
+}
