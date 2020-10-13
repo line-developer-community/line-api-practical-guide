@@ -1,4 +1,4 @@
-# 第5章 LINE CLOVA
+# 5.2 TypeScript×VS Code×CLOVAスキル開発
 
 ## ソースコード
 
