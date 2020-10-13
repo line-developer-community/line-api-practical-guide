@@ -1,0 +1,26 @@
+name: Deploy to Github Pages
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.201'
+    
+    - name: Build Application
+      run: dotnet publish -c Release ./TodoBot.Client/TodoBot.Client.csproj
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+           github_token: ${{ secrets.GITHUB_TOKEN }}
+           publish_dir: ./TodoBot.Client/bin/Release/netstandard2.1/publish/wwwroot/

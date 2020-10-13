@@ -1,0 +1,73 @@
+{"chapel":
+[
+	{
+		"id": "0",
+		"name": "チャペル挙式Ａ",
+		"placeImageUrl": "/images/chapel-01.png",
+		"place": "Ａチャペル",
+		"price": "¥900,000",
+		"costume": "洋装",
+		"costumeImageUrl": "/images/chapelshiki.png",
+		"event": "ケーキ入刀",
+		"eventImageUrl": "/images/wedding_cake_nyutou.png"
+	},
+	{
+		"id": "1",
+		"name": "チャペル挙式Ｂ",
+		"placeImageUrl": "/images/chapel-02.png",
+		"place": "Ｂチャペル",
+		"price": "¥800,000",
+		"costume": "洋装",
+		"costumeImageUrl": "/images/chapelshiki.png",
+		"event": "ケーキ入刀",
+		"eventImageUrl": "/images/wedding_cake_nyutou.png"
+	},
+	{
+		"id": "2",
+		"name": "チャペル挙式Ｃ",
+		"placeImageUrl": "/images/chapel-03.png",
+		"place": "Ｃチャペル",
+		"price": "¥700,000",
+		"costume": "洋装",
+		"costumeImageUrl": "/images/chapelshiki.png",
+		"event": "ケーキ入刀",
+		"eventImageUrl": "/images/wedding_cake_nyutou.png"
+	}
+],
+"jinja": 
+[
+	{
+		"id": "10",
+		"name": "神社挙式Ａ",
+		"placeImageUrl": "/images/jinja-01.png",
+		"place": "Ａ神社",
+		"price": "¥900,000",
+		"costume": "和装",
+		"costumeImageUrl": "/images/shinzenshiki.png",
+		"event": "鏡開き",
+		"eventImageUrl": "/images/kagamibiraki.png"
+	},
+	{
+		"id": "11",
+		"name": "神社挙式Ｂ",
+		"placeImageUrl": "/images/jinja-02.png",
+		"place": "Ｂ神社",
+		"price": "¥800,000",
+		"costume": "和装",
+		"costumeImageUrl": "/images/shinzenshiki.png",
+		"event": "鏡開き",
+		"eventImageUrl": "/images/kagamibiraki.png"
+	},
+	{
+		"id": "12",
+		"name": "神社挙式Ｃ",
+		"placeImageUrl": "/images/jinja-03.png",
+		"place": "Ｃ神社",
+		"price": "¥700,000",
+		"costume": "和装",
+		"costumeImageUrl": "/images/shinzenshiki.png",
+		"event": "鏡開き",
+		"eventImageUrl": "/images/kagamibiraki.png"
+	}
+]
+}

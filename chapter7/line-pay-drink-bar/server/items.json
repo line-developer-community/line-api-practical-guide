@@ -1,0 +1,35 @@
+[
+	{
+		"dispenseTime": 5000,
+		"description": "スキッと爽やかなコーラ",
+		"unitPrice": 120,
+		"active": true,
+		"name": "コーラ",
+		"thumbnailUrl": "https://linepaydrinkbar.appspot.com/images/cola_t.png",
+		"imageUrl": "https://linepaydrinkbar.appspot.com/images/cola.png",
+		"id": "item-0001",
+		"slot": 0
+	},
+	{
+		"dispenseTime": 3500,
+		"description": "みんな大好きオレンジジュース",
+		"unitPrice": 100,
+		"active": true,
+		"name": "オレンジジュース",
+		"thumbnailUrl": "https://linepaydrinkbar.appspot.com/images/orange_t.png",
+		"imageUrl": "https://linepaydrinkbar.appspot.com/images/orange.png",
+		"id": "item-0002",
+		"slot": 1
+	},
+	{
+		"dispenseTime": 8000,
+		"description": "ごくごく飲める麦茶",
+		"unitPrice": 80,
+		"active": true,
+		"name": "麦茶",
+		"thumbnailUrl": "https://linepaydrinkbar.appspot.com/images/mugicha_t.png",
+		"imageUrl": "https://linepaydrinkbar.appspot.com/images/mugicha.png",
+		"id": "item-0003",
+		"slot": 2
+	}
+]

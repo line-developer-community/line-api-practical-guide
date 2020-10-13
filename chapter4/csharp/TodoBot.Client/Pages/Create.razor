@@ -1,0 +1,40 @@
+﻿@page "/create"
+@inject IJSRuntime JSRuntime
+@inject ILiffClient Liff
+@inject ITodoClient TodoClient
+
+
+<TodoForm Todo="new Todo() { DueDate = DateTime.Now}"
+          ButtonName="作成"
+          ButtonClickAsync="CreateTodoAsync"></TodoForm>
+
+<Alert Message="@ErrorMessage" AlertType="danger"></Alert>
+
+@code{
+    string UserId { get; set; }
+    string AccessToken { get; set; }
+    string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!await Liff.InitializeAsync(JSRuntime))
+            {
+                return;
+            }
+            UserId = (await Liff.GetDecodedIDToken())?.Sub;
+            AccessToken = await Liff.GetAccessToken();
+        }
+        catch (Exception e)
+        {
+            ErrorMessage = e.ToString();
+        }
+    }
+
+    async Task CreateTodoAsync(Todo todo)
+    {
+        todo.UserId = UserId;
+        await TodoClient.CreateTodoAsync(AccessToken, todo);   
+    }
+}
