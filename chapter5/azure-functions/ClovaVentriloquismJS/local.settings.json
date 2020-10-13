@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "MESSAGING_API_CHANNEL_ACCESS_TOKEN": "xxxxxxxxxxxxxxxxxxxx",
+    "MESSAGING_API_CHANNEL_SECRET": "xxxxxxxxxxxxxxxxxxxx"
+  }
+}

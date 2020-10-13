@@ -1,0 +1,10 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "SkillSettings:ChannelSecret": "xxxxxxxxxxxxx",
+    "SkillSettings:ChannelAccessToken": "xxxxxxxxxxxxxx",
+    "SkillSettings:AudioUrl": "https://example.com/xxxxxx.mp3"
+  }
+}
